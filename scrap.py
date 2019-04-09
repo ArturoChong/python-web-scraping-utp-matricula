@@ -7,10 +7,12 @@ def get_credentials():
     if len(sys.argv) == 3:
         credentials['user'] = str(sys.argv[1])
         credentials['password'] = str(sys.argv[2])
-    return credentials
-def print_credentials(credentials):
-    print(f'User: {credentials["user"]} \nPassword: {credentials["password"]}')
+        return credentials
+    else:
+        return {}
 
+def print_credentials(credentials):
+    print(f'User: {credentials["user"]} \nPassword: {credentials["password"]} \n\n')
 
 def attempt_login(url, credentials):
     driver = webdriver.Chrome('./chromedriver')
@@ -32,7 +34,12 @@ def attempt_login(url, credentials):
     driver.close()
 
 credentials = get_credentials()
-print_credentials(credentials)
-url = 'http://matricula.utp.ac.pa/acceso.aspx'
-#button to make the request: imgbEnviar 
-attempt_login(url, credentials)
+
+if credentials:
+    url = 'http://matricula.utp.ac.pa/acceso.aspx'
+    attempt_login(url, credentials)
+    print("Beginning automated scraping with credentials:")
+    print_credentials(credentials)
+else:
+    print("Credentials are incomplete")
+    print("Format is: python3 scrap.py username password")
