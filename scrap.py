@@ -12,9 +12,6 @@ def get_credentials():
     else:
         return {}
 
-def print_credentials(credentials):
-    print(f'User: {credentials["user"]} \nPassword: {credentials["password"]} \n\n')
-
 def attempt_login(url, credentials):
     driver = webdriver.Chrome('./chromedriver')
     driver.get(url)
@@ -31,12 +28,25 @@ def attempt_login(url, credentials):
     student_link.click()
 
     user_data = obtain_user_data(driver)
-    print_user_data(user_data)
+    driver.get('http://matricula.utp.ac.pa/estudia/consu_horarioest.asp')
+
+    schedule = obtain_schedule(driver)
+
+    print_data(user_data, schedule)
 
     time.sleep(10)
 
     driver.close()
     return True
+
+def obtain_schedule(driver):
+    header_webdriver = driver.find_elements_by_xpath('//td[contains(@bgcolor, "#FFE2FF")]')
+    row_webdriver = driver.find_elements_by_xpath('//font[contains(@size, "1")]')
+    headers = [ item.text for item in header_webdriver ]
+    rows = [ item.text for item in row_webdriver ]
+    schedule = [rows[x:x+8] for x in range(0, len(rows), 8)]
+    schedule.insert(0, headers)
+    return schedule
 
 def obtain_user_data(driver):
     fields = ['lblnombre', 'lblCedula', 'lblCarrera', 'lblPlan', 'lblAnoEstudio', 'lblIndice', 'lblEstatus', 'lblEmail', 'lblContrasena', 'lblSede', 'lblCitaMatricula']
@@ -47,7 +57,7 @@ def obtain_user_data(driver):
         "plan": '',
         "year": '',
         "index": '',
-        "status": '',
+        "is_active": '',
         "email": '',
         "first-password": '',
         "location": '',
@@ -61,20 +71,25 @@ def obtain_user_data(driver):
         print("Check code, there might be missing fields!")
         return {}
 
-def print_user_data(user_data):
+def print_data(user_data, schedule):
     print(f'\nPrinting user data for {user_data["name"]}: \n')
     data = [list(item) for item in user_data.items()]
-    table = Texttable()
-    table.add_rows(data)
-    print(table.draw())
+
+    user_table = Texttable()
+    user_table.add_rows(data)
+    print(user_table.draw())
+
+    print(f'\nPrinting schedule data for {user_data["name"]}: \n')
+    schedule_table = Texttable()
+    schedule_table.add_rows(schedule)
+    print(schedule_table.draw())
     return True
 
 credentials = get_credentials()
 
 if credentials:
     url = 'http://matricula.utp.ac.pa/acceso.aspx'
-    print("Beginning automated scraping with credentials:")
-    print_credentials(credentials)
+    print(f"Beginning automated scraping of {url}:")
     attempt_login(url, credentials)
 else:
     print("Credentials are incomplete")
