@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from texttable import Texttable
 import sys, time
 
@@ -13,7 +14,9 @@ def get_credentials():
         return {}
 
 def attempt_login(url, credentials):
-    driver = webdriver.Chrome('./chromedriver')
+    options = Options()
+    options.headless = True
+    driver = webdriver.Chrome('./chromedriver', options=options)
     driver.get(url)
 
     cedula = driver.find_element_by_id('txtCedula')
@@ -33,8 +36,6 @@ def attempt_login(url, credentials):
     schedule = obtain_schedule(driver)
 
     print_data(user_data, schedule)
-
-    time.sleep(10)
 
     driver.close()
     return True
