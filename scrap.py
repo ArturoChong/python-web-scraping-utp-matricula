@@ -2,13 +2,14 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from texttable import Texttable
+from getpass import getpass
 import sys, time
 
 def get_credentials():
     credentials = {'user': '', 'password':''}
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 2:
         credentials['user'] = str(sys.argv[1])
-        credentials['password'] = str(sys.argv[2])
+        credentials['password'] = getpass("Password: ")
         return credentials
     else:
         return {}
@@ -94,4 +95,4 @@ if credentials:
     attempt_login(url, credentials)
 else:
     print("Credentials are incomplete")
-    print("Format is: python3 scrap.py username password")
+    print("Format is: python3 scrap.py username")
